@@ -18,14 +18,25 @@ body.light-mode .container {
 
 body.light-mode .block {
   background: #ffffff;
+  color: #2d3436;
 }
 
 body.light-mode .result {
   background: #f5f6fa;
+  color: #2d3436;
+}
+
+body.light-mode .block p,
+body.light-mode li,
+body.light-mode a,
+body.light-mode strong,
+body.light-mode pre {
+  color: #2d3436 !important;
 }
 
 body.light-mode button {
   background-color: #2d3436;
+  color: #ffffff;
 }
 
 body.light-mode button:hover {
@@ -171,6 +182,7 @@ p {
   color: #fff;
   border-color: #c0392b;
 }
+
 
 
 
