@@ -133,8 +133,10 @@ app.post("/analyze", upload.single("file"), async (req, res) => {
       result = { type: "image", text, suspicious };
     } else if (ext === ".eml") {
       const raw = fs.readFileSync(filePath, "utf8");
-      const urls = raw.match(/https?:\/\/[\w\.\-\/\?=&%#]+/gi) || [];
+
+      const urls = raw.match(/https?:\/\/[^\s"'>)]+/gi) || [];
       console.log("🩇 Табылған URL-дер:", urls);
+
       const from = raw.match(/^From: (.+)$/mi)?.[1] || "Қатені анықтау мүмкін емес";
       const subject = raw.match(/^Subject: (.+)$/mi)?.[1] || "Тақырып жоқ";
 
