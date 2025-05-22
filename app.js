@@ -7,6 +7,7 @@ const tesseract = require("tesseract.js");
 const dns = require("dns").promises;
 const axios = require("axios");
 const PDFDocument = require("pdfkit");
+const { simpleParser } = require("mailparser");
 require("dotenv").config();
 
 const app = express();
@@ -132,13 +133,20 @@ app.post("/analyze", upload.single("file"), async (req, res) => {
       const suspicious = text.match(/(login|verify|reset|click here|account)/gi) || [];
       result = { type: "image", text, suspicious };
     } else if (ext === ".eml") {
-      const raw = fs.readFileSync(filePath, "utf8");
+      const raw = fs.readFileSync(filePath);
+      const parsed = await simpleParser(raw);
 
-      const urls = raw.match(/https?:\/\/[^\s"'>)]+/gi) || [];
+      const text = parsed.text || "";
+      const html = parsed.html || "";
+
+      const urlsText = [...text.matchAll(/https?:\/\/[^\s"'<>()]+/gi)].map(m => m[0]) || [];
+      const urlsHtml = [...html.matchAll(/https?:\/\/[^\s"'<>()]+/gi)].map(m => m[0]) || [];
+      const urls = [...new Set([...urlsText, ...urlsHtml])];
+
       console.log("🩇 Табылған URL-дер:", urls);
 
-      const from = raw.match(/^From: (.+)$/mi)?.[1] || "Қатені анықтау мүмкін емес";
-      const subject = raw.match(/^Subject: (.+)$/mi)?.[1] || "Тақырып жоқ";
+      const from = parsed.from?.text || "Кімнен ақпарат табылмады";
+      const subject = parsed.subject || "Тақырып жоқ";
 
       const domainMatch = from.match(/@([\w.-]+)/);
       const domain = domainMatch ? domainMatch[1] : null;
