@@ -1,0 +1,26 @@
+{
+  "name": "phishing-app",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.9.0",
+    "cookie-parser": "^1.4.7",
+    "dns": "^0.1.2",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "i18n": "^0.15.1",
+    "multer": "^2.0.0",
+    "path": "^0.12.7",
+    "pdfkit": "^0.17.1",
+    "tesseract.js": "^6.0.1"
+  },
+  "description": ""
+}

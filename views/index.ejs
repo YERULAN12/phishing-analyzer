@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8">
+  <title>Фишингке қарсы анализатор</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Фишингке қарсы тексеру</h1>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+      <div>
+        <button onclick="setLanguage('kk')">🇰🇿 Қазақша</button>
+        <button onclick="setLanguage('ru')">🇷🇺 Русский</button>
+      </div>
+      <div>
+        <button onclick="toggleTheme()">🌗 Режим</button>
+      </div>
+    </div>
+
+    <form action="/analyze" method="POST" enctype="multipart/form-data">
+      <input type="file" name="file" required>
+      <button type="submit">Тексеру</button>
+    </form>
+
+    <% if (result) { %>
+      <div class="result">
+
+        <!-- 🔒 Қауіп деңгейі -->
+        <% if (result.riskLevel) { %>
+          <div class="risk <%= result.riskLevel.toLowerCase() %>">
+            Қауіп деңгейі: <strong><%= result.riskLevel %></strong>
+          </div>
+        <% } %>
+
+        <h2>Нәтиже:</h2>
+
+        <% if (result.error) { %>
+          <div class="block danger">
+            <p><%= result.error %></p>
+          </div>
+
+        <% } else if (result.type === 'image') { %>
+          <div class="block warning">
+            <p><strong>🖼 Мәтін:</strong></p>
+            <pre><%= result.text %></pre>
+            <p><strong>⚠️ Күдікті сөздер:</strong> <%= result.suspicious.join(', ') %></p>
+          </div>
+
+        <% } else if (result.type === 'eml') { %>
+          <div class="block">
+            <p><strong>👤 Кімнен:</strong> <%= result.from %></p>
+            <p><strong>📌 Тақырып:</strong> <%= result.subject %></p>
+            <p><strong>🔗 Сілтемелер:</strong></p>
+            <ul>
+              <% result.urls.forEach(url => { %>
+                <li><%= url %></li>
+              <% }) %>
+            </ul>
+          </div>
+
+          <div class="block warning">
+            <p><strong>📡 Домен:</strong> <%= result.domain %></p>
+            <p><strong>✅ SPF:</strong> <%= result.spf %></p>
+            <p><strong>🔐 DKIM:</strong> <%= result.dkim %></p>
+            <p><strong>📬 DMARC:</strong> <%= result.dmarc %></p>
+          </div>
+
+          <h3>🛡 VirusTotal Тексеру:</h3>
+          <% if (result.vtResults && result.vtResults.length > 0) { %>
+            <% result.vtResults.forEach(r => { %>
+              <div class="block <%= r.vt.malicious > 1 ? 'danger' : (r.vt.suspicious > 0 ? 'warning' : 'safe') %>">
+                <p><strong>🔗 <%= r.url %></strong></p>
+                <% if (r.vt.error) { %>
+                  <p style="color:red;">⚠️ <%= r.vt.error %></p>
+                <% } else { %>
+                  <ul>
+                    <% for (const [key, value] of Object.entries(r.vt)) { %>
+                      <li><strong><%= key %>:</strong> <%= value %></li>
+                    <% } %>
+                  </ul>
+                <% } %>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p style="color:gray;">🔍 VirusTotal нәтижесі табылмады немесе сілтемелер анықталмады.</p>
+          <% } %>
+
+          <!-- 📥 PDF Жүктеу батырмасы -->
+          <div style="margin-top: 20px;">
+            <a href="/download?
+              from=<%= encodeURIComponent(result.from) %>
+              &subject=<%= encodeURIComponent(result.subject) %>
+              &domain=<%= result.domain %>
+              &spf=<%= result.spf %>
+              &dkim=<%= result.dkim %>
+              &dmarc=<%= result.dmarc %>
+              &risk=<%= result.riskLevel %>
+              &urls=<%= encodeURIComponent(result.urls.join(',')) %>"
+              target="_blank">
+              <button>📥 PDF жүктеу</button>
+            </a>
+          </div>
+
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
+  <script>
+    function setLanguage(lang) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', lang);
+      window.location.href = url.toString();
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      const isLight = body.classList.toggle('light-mode');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light') {
+        document.body.classList.add('light-mode');
+      }
+    });
+  </script>
+</body>
+</html>
