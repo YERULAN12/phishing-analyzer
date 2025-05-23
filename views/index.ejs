@@ -27,7 +27,6 @@
     <% if (result) { %>
       <div class="result">
 
-        <!-- 🔒 Қауіп деңгейі -->
         <% if (result.riskLevel) { %>
           <div class="risk <%= result.riskLevel.toLowerCase() %>">
             Қауіп деңгейі: <strong><%= result.riskLevel %></strong>
@@ -87,7 +86,7 @@
             <p style="color:gray;">🔍 VirusTotal нәтижесі табылмады немесе сілтемелер анықталмады.</p>
           <% } %>
 
-          <!-- 📥 PDF Жүктеу батырмасы -->
+          <!-- 📥 PDF жүктеу -->
           <div style="margin-top: 20px;">
             <a href="/download?
               from=<%= encodeURIComponent(result.from) %>
@@ -126,7 +125,23 @@
       if (saved === 'light') {
         document.body.classList.add('light-mode');
       }
+
+      // 📋 Суретті Ctrl+V арқылы жүктеу
+      document.addEventListener("paste", function (event) {
+        const items = (event.clipboardData || event.originalEvent.clipboardData).items;
+        for (const item of items) {
+          if (item.type.indexOf("image") === 0) {
+            const blob = item.getAsFile();
+            const fileInput = document.querySelector('input[type="file"]');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(blob);
+            fileInput.files = dataTransfer.files;
+            alert("📷 Скриншот қойылды! Енді 'Тексеру' батырмасын бас.");
+          }
+        }
+      });
     });
   </script>
 </body>
 </html>
+
