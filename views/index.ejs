@@ -9,33 +9,21 @@
   <div class="container">
     <h1>Фишингке қарсы тексеру</h1>
 
-    <!-- 🔐 Кіру/Тіркелу UI -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
       <div>
         <button onclick="setLanguage('kk')">🇰🇿 Қазақша</button>
         <button onclick="setLanguage('ru')">🇷🇺 Русский</button>
       </div>
       <div>
-        <% if (user) { %>
-          <span>👤 <strong><%= user.username %></strong></span>
-          <form action="/logout" method="POST" style="display:inline;">
-            <button type="submit">🚪 Шығу</button>
-          </form>
-        <% } else { %>
-          <a href="/login"><button>🔑 Кіру</button></a>
-          <a href="/register"><button>📝 Тіркелу</button></a>
-        <% } %>
         <button onclick="toggleTheme()">🌗 Режим</button>
       </div>
     </div>
 
-    <!-- 📤 Файл жүктеу -->
     <form action="/analyze" method="POST" enctype="multipart/form-data">
       <input type="file" name="file" required>
       <button type="submit">Тексеру</button>
     </form>
 
-    <!-- 📊 Нәтижелер -->
     <% if (result) { %>
       <div class="result">
 
@@ -132,11 +120,13 @@
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     }
 
-    // 📋 Скриншот қою
     window.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('theme');
-      if (saved === 'light') document.body.classList.add('light-mode');
+      if (saved === 'light') {
+        document.body.classList.add('light-mode');
+      }
 
+      // 📋 Суретті Ctrl+V арқылы жүктеу
       document.addEventListener("paste", function (event) {
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
         for (const item of items) {
@@ -154,5 +144,4 @@
   </script>
 </body>
 </html>
-
 
