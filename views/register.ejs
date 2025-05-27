@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <title>Тіркелу - Фишингке қарсы анализатор</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Тіркелу</h1>
+    <% if (error) { %>
+      <div class="block danger"><%= error %></div>
+    <% } %>
+    <form action="/register" method="POST">
+      <label for="username">Пайдаланушы аты:</label>
+      <input type="text" name="username" id="username" required />
+
+      <label for="password">Құпия сөз:</label>
+      <input type="password" name="password" id="password" required />
+
+      <label for="confirm_password">Құпия сөзді растау:</label>
+      <input type="password" name="confirm_password" id="confirm_password" required />
+
+      <button type="submit">Тіркелу</button>
+    </form>
+    <p>Егер тіркелген болсаңыз, <a href="/login">кіру</a></p>
+    <p><a href="/">← Басты бет</a></p>
+  </div>
+</body>
+</html>
