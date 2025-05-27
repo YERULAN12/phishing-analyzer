@@ -12,7 +12,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000; // <-- Вот тут изменено
+const PORT = process.env.PORT || 3000;
 
 // Тіркелген қолданушылар тізімі (JSON файл арқылы)
 const USERS_FILE = "users.json";
@@ -22,11 +22,19 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
+// Важно: если используешь Render, он проксирует запросы, нужно доверять прокси
+app.set('trust proxy', 1);
+
 // Session middleware
 app.use(session({
   secret: "phishing-secret-key",
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === "production", // https только в продакшене
+    maxAge: 1000 * 60 * 60 * 24, // 1 день
+    sameSite: 'lax' // если нужны кросс-доменные куки, можно поставить 'none', но тогда secure: true обязательно
+  }
 }));
 
 // ⛔ Қол жеткізуді қорғау
@@ -130,7 +138,14 @@ app.post("/login", async (req, res) => {
 
 // 🚪 Шығу
 app.get("/logout", (req, res) => {
-  req.session.destroy(() => res.redirect("/login"));
+  req.session.destroy(err => {
+    if (err) {
+      console.error("Ошибка выхода из системы:", err);
+      return res.status(500).send("Ошибка выхода из системы");
+    }
+    res.clearCookie('connect.sid');
+    res.redirect("/login");
+  });
 });
 
 // 🧾 Dashboard
