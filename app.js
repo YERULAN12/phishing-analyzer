@@ -12,7 +12,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // <-- Вот тут изменено
 
 // Тіркелген қолданушылар тізімі (JSON файл арқылы)
 const USERS_FILE = "users.json";
@@ -207,7 +207,7 @@ app.get("/download", isAuthenticated, (req, res) => {
   doc.text(`✅ SPF: ${data.spf}`);
   doc.text(`🔐 DKIM: ${data.dkim}`);
   doc.text(`📬 DMARC: ${data.dmarc}`);
-  doc.text(`🛡 Қауіп деңгейі: ${data.risk}`);
+  doc.text(`🛡 Қауіп деңгейі: ${data.riskLevel}`);
   doc.moveDown();
 
   if (data.urls) {
